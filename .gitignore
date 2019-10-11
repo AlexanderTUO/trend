@@ -1,0 +1,10 @@
+# 忽略所有.class文件
+*.class
+# 不要忽略.java文件
+!*.java
+# 包文件
+*.jar
+*.war
+*.ear
+/.idea/*
+*.iml
