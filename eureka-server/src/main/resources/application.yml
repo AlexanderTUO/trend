@@ -1,0 +1,12 @@
+eureka:
+  instance:
+    hostname: localhost
+    client:
+      registerWithEureka: false
+      fetchRegistry: false
+      serviceUrl:
+        defaulZone: http://#{eureka.instance.hostname}:${server.port}/euraka/
+
+spring:
+  application:
+    name:eureka-server
