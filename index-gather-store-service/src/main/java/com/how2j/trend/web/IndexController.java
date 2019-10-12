@@ -22,7 +22,18 @@ public class IndexController {
 
     @GetMapping("/getCodes")
     public List<Index> getCodes() throws Exception{
-        List<Index> indexes = indexService.fetchDataFromThirdPart();
-        return indexes;
+        return indexService.get();
     }
+
+    @GetMapping("/freshCodes")
+    public List<Index> freshCodes() {
+        return indexService.fresh();
+    }
+
+    @GetMapping("/removeCodes")
+    public String removeCodes() {
+        indexService.remove();
+        return "remove codes Successfully";
+    }
+
 }

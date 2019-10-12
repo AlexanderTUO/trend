@@ -5,6 +5,7 @@ import com.how2j.trend.pojo.Index;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -21,18 +22,48 @@ import java.util.Map;
 @Service
 @CacheConfig(cacheNames = "indexes")
 public class IndexService {
+
+    private List<Index> indexes;
+
     @Autowired
     private RestTemplate restTemplate;
 
-    @HystrixCommand(fallbackMethod = "thirdPartNotConnect")
-    @Cacheable(key = "'all_codes'")
+    @Autowired
+    IndexService indexService;
+
+
     public List<Index> fetchDataFromThirdPart() {
         List<Map> temp = restTemplate.getForObject("http://127.0.0.1:8090/indexes/codes.json", List.class);
         return map2index(temp);
     }
 
+    @CacheEvict(allEntries = true)
+    public void remove() {
+
+    }
+
+    @Cacheable(key = "'all_codes'")
+    public List<Index> get() {
+        return CollectionUtil.toList();
+    }
+
+
+    @Cacheable(key = "'all_codes'")
+    public List<Index> store() {
+        System.out.println(this);
+        return indexes;
+    }
+
+    @HystrixCommand(fallbackMethod = "thirdPartNotConnect")
+    public List<Index> fresh() {
+        indexService.remove();
+        indexes = fetchDataFromThirdPart();
+        indexService.store();
+        return indexes;
+    }
+
     private List<Index> map2index(List<Map> temp) {
-        List<Index> indexes = new ArrayList<>();
+        indexes = new ArrayList<>();
         for (Map map : temp) {
             String code = map.get("code").toString();
             String name = map.get("name").toString();
