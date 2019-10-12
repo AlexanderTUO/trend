@@ -50,7 +50,7 @@ public class IndexDataService {
         List<IndexData> indexDataList = fetchIndexDataFromThirdPart(code);
         indexDatas.put(code, indexDataList);
         indexDataService.store(code);
-        return null;
+        return indexDatas.get(code);
     }
 
     private List<IndexData> map2IndexData(List<Map> maps) {
