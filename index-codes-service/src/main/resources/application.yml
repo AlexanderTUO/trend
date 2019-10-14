@@ -1,6 +1,6 @@
 spring:
   application:
-    name: index-codex-service
+    name: index-codes-service
 
 eureka:
   client:
