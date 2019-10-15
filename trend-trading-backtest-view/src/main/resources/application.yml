@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: trend-trading-backtest-view
+
+eureka:
+  client:
+    serverUrl:
+      defaultZone: http://localhost:8761/eureka
+
+thymeleaf:
+  mode: LEGACYHTML5
+  encoding: utf-8
+  content-type: text/html
+  cache: false
