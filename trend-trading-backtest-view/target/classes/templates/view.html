@@ -7,16 +7,23 @@
 <body>
     <script>
         $(function () {
-            var data4Vue = {};
+            var data4Vue = {
+                indexes: [],
+                currentIndex: "000300"
+            };
             var vue = new Vue({
                 el: "#workingArea",
                 data:data4Vue,
                 mounted: function () {
                     this.init();
+                    $("[data-toggle='tooltip']").tooltip();
                 },
                 methods:{
                     init:function () {
-                        
+                        var url = "http://127.0.0.1:8031/api-codes/codes";
+                        axios.get(url).then(function (value) {
+                            vue.indexes = value.data;
+                        });
                     }
                 }                    
             })
@@ -37,7 +44,27 @@
         }
     </style>
     <div id="workingArea">
-        <span class="label label-info">模拟回调</span>
+        <span class="label label-info">回测参数</span>
+        <table id="inputTable">
+            <tr>
+                <td>
+                    <span title="请选择一个指数进行模拟回测" data-toggle="tooltip"
+                    data-placement = "top">
+                        请选择指数：<span class="glyphicon glyphicon-question-sign"></span>
+                    </span>
+                </td>
+                <td>
+                    <select v-model="currentIndex" class="indexSelect form-control" >
+                        <option v-for="bean in indexes" :value="bean.code">
+                            {{bean.name}} --{{bean.code}}
+                        </option>
+                    </select>
+                </td>
+                <td></td>
+                <td></td>
+            </tr>
+        </table>
     </div>
+    <div th:replace="include/footer::html"></div>
 </body>
 </html>

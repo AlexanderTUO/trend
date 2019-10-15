@@ -17,7 +17,7 @@ zuul:
       serviceId: trend-trading-backtest-service
     api-c:
       path: /api-view/**
-      serviceId: trend-trading-backview-service
+      serviceId: trend-trading-backtest-view
   max:
     host:
       connections: 500
