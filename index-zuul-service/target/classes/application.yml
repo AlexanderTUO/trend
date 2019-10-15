@@ -14,7 +14,7 @@ zuul:
       serviceId: index-codes-service
     api-b:
       path: /api-backtest/**
-      serviceId: index-trading-backtest-service
+      serviceId: trend-trading-backtest-service
   max:
     host:
       connections: 500
