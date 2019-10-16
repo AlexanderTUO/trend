@@ -6,31 +6,103 @@
 </head>
 <body>
     <script>
+        var chart4Profit = null;
         $(function () {
             var data4Vue = {
                 indexes: [],
-                currentIndex: "000300"
+                currentIndex: "000300",
+                indexDatas: [],
+                dates: [],
+                closePoints: []
             };
             var vue = new Vue({
                 el: "#workingArea",
-                data:data4Vue,
+                data: data4Vue,
                 mounted: function () {
                     this.init();
                     $("[data-toggle='tooltip']").tooltip();
                 },
-                methods:{
-                    init:function () {
+                methods: {
+                    init: function () {
                         var url = "http://127.0.0.1:8031/api-codes/codes";
                         axios.get(url).then(function (value) {
                             vue.indexes = value.data;
                         });
+                    },
+                    simulate: function () {
+                        var url = "http://127.0.0.1:8031/api-backtest/simulate/" + vue.currentIndex;
+                        axios.get(url).then(function (value) {//返回的数据为map
+                            vue.indexDatas = value.data.indexDatas;
+                            vue.dates = new Array();
+                            vue.closePoints = new Array();
+                            for (var i = 0, len = vue.indexDatas.length; i < len; i++) {
+                                var indexData = vue.indexDatas[i];
+                                vue.dates.push(indexData.date);
+                                vue.closePoints.push(indexData.closePoint);
+                            }
+                            chart4Profit.config.labels = vue.dates;
+                            chart4Profit.config.datasets.label = vue.currentIndex;
+                            chart4Profit.config.datasets.data = vue.closePoints;
+                            chart4Profit.update();
+                        });
                     }
-                }                    
-            })
+                }
+            });
+            var ctx4Profit = $(".canvas4Profit")[0].getContext('2d');
+            chart4Profit = new Chart(ctx4Profit, {
+                type: 'line',
+                data:{
+                    labels: '',
+                    datasets: [
+                        {
+                            label: '',
+                            data: [],
+                            borderColor: '#FF4040',
+                            backgroundColor: '#FF4040',
+                            borderWidth: 1.2,
+                            pointRadius:0,
+                            fill: false,
+                            lineTension:0
+                        }
+                    ]
+                },
+                options:{
+                    title:{
+                       display:true,
+                       text:"趋势投资"
+                    } ,
+                    responsive: true,
+                    responsiveAnimationDuration: 300,
+                    scales: {
+                        yAex:[
+                            {
+                                ticks:{
+                                    beginAtZero: false
+                                }
+                            }
+                        ]
+                    },
+                    tooltip:{
+                        model: 'index',
+                        interact: false,
+                        axis: 'y',
+                        callbacks:{
+                            labels:function (tooltipItem, myData) {
+                                var label = myData.datasets[tooltipItem.dataIndex].label || '';
+                                if (label) {
+                                    label += "";
+                                }
+                                label += parseFloat(tooltipItem.value).toFixed(2);
+                                return label;
+                            }
+                        }
+                    }
+                }
+            });
         });
     </script>
     <style>
-        table.inputTable{
+        table.inputTable {
             width: 100%;
         }
         table.inputTable td{
@@ -64,6 +136,9 @@
                 <td></td>
             </tr>
         </table>
+        <div class="div4Profit" style="margin: 0px auto;width: 80%">
+            <canvas class="canvas4Profit"></canvas>
+        </div>
     </div>
     <div th:replace="include/footer::html"></div>
 </body>
