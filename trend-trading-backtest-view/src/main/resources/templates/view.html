@@ -13,7 +13,12 @@
                 currentIndex: "000300",
                 indexDatas: [],
                 dates: [],
-                closePoints: []
+                closePoints: [],
+                flushDate: true,
+                indexStartDate: '',
+                indexEndDate: '',
+                startDate:'',
+                endDate: ''
             };
             var vue = new Vue({
                 el: "#workingArea",
@@ -27,11 +32,17 @@
                         var url = "http://127.0.0.1:8031/api-codes/codes";
                         axios.get(url).then(function (value) {
                             vue.indexes = value.data;
+                            vue.$nextTick(function () {
+                                vue.simulate();
+                            })
                         });
                     },
                     simulate: function () {
-                        var url = "http://127.0.0.1:8031/api-backtest/simulate/" + vue.currentIndex;
+                        var url = "http://127.0.0.1:8031/api-backtest/simulate/" + vue.currentIndex+"/"+vue.startDate+"/"+vue.endDate;
                         axios.get(url).then(function (value) {//返回的数据为map
+                            vue.startDate  = value.data.indexStartDate;
+                            vue.endDate = value.data.indexEndDate;
+
                             vue.indexDatas = value.data.indexDatas;
                             vue.dates = new Array();
                             vue.closePoints = new Array();
@@ -40,11 +51,14 @@
                                 vue.dates.push(indexData.date);
                                 vue.closePoints.push(indexData.closePoint);
                             }
-                            chart4Profit.config.labels = vue.dates;
-                            chart4Profit.config.datasets.label = vue.currentIndex;
-                            chart4Profit.config.datasets.data = vue.closePoints;
+                            chart4Profit.config.data.labels = vue.dates;
+                            chart4Profit.config.data.datasets[0].label = vue.currentIndex;
+                            chart4Profit.config.data.datasets[0].data = vue.closePoints;
                             chart4Profit.update();
                         });
+                    },
+                    changeParamWithFlushDate:function () {
+                        vue.simulate();
                     }
                 }
             });
@@ -117,16 +131,16 @@
     </style>
     <div id="workingArea">
         <span class="label label-info">回测参数</span>
-        <table id="inputTable">
+        <table class="inputTable">
             <tr>
-                <td>
+                <td width="25%">
                     <span title="请选择一个指数进行模拟回测" data-toggle="tooltip"
                     data-placement = "top">
                         请选择指数：<span class="glyphicon glyphicon-question-sign"></span>
                     </span>
                 </td>
-                <td>
-                    <select v-model="currentIndex" class="indexSelect form-control" >
+                <td width="25%">
+                    <select @change="changeParamWithFlushDate" v-model="currentIndex" class="indexSelect form-control" >
                         <option v-for="bean in indexes" :value="bean.code">
                             {{bean.name}} --{{bean.code}}
                         </option>

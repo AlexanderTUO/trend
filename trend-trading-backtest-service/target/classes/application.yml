@@ -1,6 +1,6 @@
 spring:
   application:
-    name: index-trading-backtest-service
+    name: trend-trading-backtest-service
 
 eureka:
   client:
