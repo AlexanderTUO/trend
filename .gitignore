@@ -8,3 +8,7 @@
 *.ear
 /.idea/*
 *.iml
+/target/../*
+/target/classes/../*
+*.yml
+
